@@ -50,10 +50,6 @@ object ModuleRegen : Module("Regen", Category.PLAYER) {
                 return@repeatable
             }
 
-            if (player.hungerManager.foodLevel < 20) {
-                return@repeatable
-            }
-
             repeat(speed) {
                 network.sendPacket(PlayerMoveC2SPacket(player.isOnGround))
             }
