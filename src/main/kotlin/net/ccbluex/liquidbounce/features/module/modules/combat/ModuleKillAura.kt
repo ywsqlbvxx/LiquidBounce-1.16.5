@@ -45,6 +45,7 @@ import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.AxeItem
+import net.minecraft.item.SwordItem
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket
 import net.minecraft.network.packet.c2s.play.PlayerInteractEntityC2SPacket
@@ -86,6 +87,9 @@ object ModuleKillAura : Module("KillAura", Category.COMBAT) {
     private val keepSprint by boolean("KeepSprint", true)
     private val unsprintOnCrit by boolean("UnsprintOnCrit", true)
     private val attackShielding by boolean("AttackShielding", false)
+    private val autoBlock by boolean("AutoBlock", true)
+
+    private var isBlockingStatus = false
 
     private val raycast by enumChoice("Raycast", TRACE_ALL, values())
 
@@ -99,6 +103,11 @@ object ModuleKillAura : Module("KillAura", Category.COMBAT) {
 
     override fun disable() {
         targetTracker.cleanup()
+    
+        if (isBlockingStatus) {
+            network.sendPacket(PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN))
+            isBlockingStatus = false
+        }
     }
 
 //    val renderHandler = handler<EngineRenderEvent> {
